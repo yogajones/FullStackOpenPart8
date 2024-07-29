@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
 import { ALL_AUTHORS, EDIT_BIRTH_YEAR } from "../queries"
 import { useQuery, useMutation } from '@apollo/client'
 
-const SetBirthYear = () => {
+const SetBirthYear = ({authors}) => {
   const [name, setName] = useState('')
   const [year, setYear] = useState('')
 
@@ -24,13 +25,11 @@ const SetBirthYear = () => {
     <div>
       <h3>Set birth year</h3>
       <form onSubmit={submit}>
-        <div>
-          name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
-        </div>
+        <select onChange={({ target }) => setName(target.value)} value={name}>
+          {authors.map((a) => (
+            <option key={a.name} value={a.name}>{a.name}</option>
+          ))}
+        </select>
         <div>
           born
           <input
@@ -47,7 +46,6 @@ const SetBirthYear = () => {
 const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS)
 
-  // eslint-disable-next-line react/prop-types
   if (!props.show) {
     return null
   }
@@ -77,7 +75,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <SetBirthYear/>
+      <SetBirthYear authors={authors}/>
     </div>
   )
 }
