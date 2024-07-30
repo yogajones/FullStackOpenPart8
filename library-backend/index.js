@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 const Book = require('./models/book')
 const Author = require('./models/author')
+const { GraphQLError } = require('graphql')
 
 require('dotenv').config()
 
@@ -78,11 +79,34 @@ const resolvers = {
       let existingAuthor = await Author.findOne({ name: args.author })
       if (!existingAuthor) {
         const author = new Author({name: args.author})
-        existingAuthor = await author.save()
+        try {
+          existingAuthor = await author.save()
+        } catch (error) {
+          throw new GraphQLError('Failed to save author', {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.author,
+              error
+            }
+          })
+        }
       }
 
       const book = new Book({ ...args, author: existingAuthor })
-      return book.save()
+      
+      try {
+        await book.save()
+      } catch (error) {
+        throw new GraphQLError('Failed to save book', {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
+
+      return book
     },
     editAuthor: async (root, args) => {
       const updatedAuthor = await Author.findOneAndUpdate({name: args.name}, {born: args.setBornTo}, {new: true})
