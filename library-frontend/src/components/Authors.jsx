@@ -21,6 +21,11 @@ const SetBirthYear = ({authors}) => {
 
   }
 
+  const token = localStorage.getItem('user-token')
+  if (!token) {
+    return null
+  }
+
   return (
     <div>
       <h3>Set birth year</h3>
