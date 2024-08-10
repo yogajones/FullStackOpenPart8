@@ -14,32 +14,26 @@ export const ALL_AUTHORS = gql`
 export const ALL_BOOKS = gql`
   query {
     allBooks {
-      title
-      published
-      genres
-      author {
-        name
-      }
+      ...BookDetails
     }
   }
+  ${BOOK_DETAILS}
 `
+
 
 export const ALL_BOOKS_AND_ME = gql`
   query {
     allBooks {
-      title
-      published
-      genres
-      author {
-        name
-      }
+      ...BookDetails
     }
     me {
       username
       favoriteGenre
-    }  
+    }
   }
+  ${BOOK_DETAILS}
 `
+
 
 export const ADD_BOOK = gql`
   mutation addBook($title: String!, $published: Int!, $author: String!, $genres: [String!]) {
@@ -49,18 +43,13 @@ export const ADD_BOOK = gql`
       author: $author,
       genres: $genres
     ) {
-      title
-      genres
+      ...BookDetails
       id
-      published
-      author {
-        name
-        born
-        bookCount
-      }
     }
   }
+  ${BOOK_DETAILS}
 `
+
 
 export const EDIT_BIRTH_YEAR = gql`
   mutation editAuthor($name: String!, $setBornTo: Int!) {
@@ -78,3 +67,24 @@ export const LOGIN = gql`
     }
   }
 `
+
+const BOOK_DETAILS = gql`
+  fragment BookDetails on Book {
+    title
+    published
+    genres
+    author {
+      name
+    }
+  }
+`
+
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+  ${BOOK_DETAILS}
+`
+
